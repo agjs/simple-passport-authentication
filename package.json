@@ -1,0 +1,20 @@
+{
+  "name": "passport-authentication",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Aleksandar Grbic <agrbicpp@gmail.com> (https://codeyoufools.com)",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^1.0.2",
+    "body-parser": "^1.16.0",
+    "express": "^4.14.1",
+    "express-session": "^1.15.0",
+    "mongoose": "^4.8.0",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0"
+  }
+}
