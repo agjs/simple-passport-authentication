@@ -3,26 +3,37 @@ const LocalStrategy = require('passport-local').Strategy;
 const User = require('../api/user/user.model');
 
 module.exports = new LocalStrategy({
+
     usernameField: 'email',
     passwordField: 'password'
+    
 }, (email, password, done) => {
-    console.log('Console.log from local strategy!');
+
     User.findOne({
         email: email
     }, (err, user) => {
-        if (err) {
-            return done(err);
-        }
-        if (!user) {
-            return done(null, false, {
-                message: 'Incorrect username.'
+
+        return new Promise((resolve, reject) => {
+
+            if (err) {
+                reject(err);
+            }
+            
+            if (!user) {
+                reject(new Error('Your username is incorrect'));
+            }
+
+            user.validPassword(password, (error, matches) => {
+                if(error) {
+                    reject(error);
+                }
+                matches ? resolve(user) : reject(new Error('Wrong username or password'));
             });
-        }
-        if (!user.validPassword(password)) {
-            return done(null, false, {
-                message: 'Incorrect password.'
-            });
-        }
-        return done(null, user);
+
+        }).then((user) => {
+            done(null, user)
+        }).catch((error) => {
+            done(error);
+        });
     });
 })

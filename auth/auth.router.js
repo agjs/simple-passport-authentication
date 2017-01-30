@@ -5,7 +5,6 @@ let controller = require('./auth.controller');
 
 router.route('/login')
     .post(passport.authenticate('local'), (req, res) => {
-        console.log('login');
         res.status(200).json(req.user);
     });
 

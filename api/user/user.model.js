@@ -16,13 +16,20 @@ let userSchema = new schema({
 });
 
 
-userSchema.methods.validPassword = function (password) {
-    return bcrypt.compare(password, this.password, (err, res) => {
-        console.log(password + " : " + this.password);
-        console.log('Password match!');
-        return res;
+userSchema.methods.validPassword = function (password, callback) {
+    bcrypt.compare(password, this.password, (error, res) => {
+        return new Promise((resolve, reject) => {
+
+        error ? reject(error) : resolve(res);
+
+        }).then((response) => {
+            callback(null, response);
+        }).catch((error) => {
+            callback(error);
+        });
+
     });
 }
 
-
 module.exports = mongoose.model('User', userSchema);
+
