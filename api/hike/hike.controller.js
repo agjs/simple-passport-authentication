@@ -20,35 +20,46 @@ function filteredHikes(results) {
     return filtered;
 }
 
-controller.reviewsByUser = function (req, res) {
-
+controller.reviewsByUser = function (req, res, next) {
     Review.find({
             _hiker: req.body.id
         })
         .then(function (reviews) {
             res.status(200).json(reviews);
         }).catch(function (error) {
-            console.log(error);
+            next(error);
         });
 };
 
-controller.savedHikes = function (req, res) {
-
-    let hike = new Hike({
+controller.savedHikes = function (req, res, next) {
+    Hike.find({
         _hiker: req.user.id
+    }).then(function (success) {
+        res.status(200).json(success);
+    }).catch(function (error) {
+        next(error);
+    });
+}
+
+controller.saveHike = function (req, res, next) {
+
+    Hike.update({
+        _hiker: req.user.id
+    }, {
+        $addToSet: {
+            hikes: parseInt(req.params.id)
+        }
+    }, {
+        upsert: true
+    }).then(function (success) {
+        res.status(201).json(success);
+    }).catch(function (error) {
+        next(error);
     });
 
-    hike.hikes.addToSet(req.body.unique_id);
-    hike.save(function (err) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log('Created');
-        }
-    });
 };
 
-controller.findHikeById = function (req, res) {
+controller.findHikeById = function (req, res, next) {
 
     let {
         id,
@@ -74,14 +85,14 @@ controller.findHikeById = function (req, res) {
                     res.status(200).json(results);
 
                 }).catch(function (error) {
-                    console.log(error);
+                    next(error);
                 });
 
         });
 
 };
 
-controller.findHikesByStateAndCity = function (req, res) {
+controller.findHikesByStateAndCity = function (req, res, next) {
 
     let {
         city,
@@ -98,7 +109,7 @@ controller.findHikesByStateAndCity = function (req, res) {
         });
 };
 
-controller.addReviewToHike = function (req, res) {
+controller.addReviewToHike = function (req, res, next) {
     Review.create({
         _hiker: req.user.id,
         hike: req.body.hike_id,
@@ -108,7 +119,7 @@ controller.addReviewToHike = function (req, res) {
         res.status(201).json(review);
 
     }).catch(function (error) {
-        console.log(error);
+        next(error);
     });
 }
 

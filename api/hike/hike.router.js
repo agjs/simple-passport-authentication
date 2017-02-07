@@ -3,7 +3,8 @@ let controller = require('./hike.controller');
 let authUtils = require('../../auth/auth.utils');
 
 router.route('/uid=:id')
-    .get(authUtils.isLoggedIn, controller.findHikeById);
+    .get(authUtils.isLoggedIn, controller.findHikeById)
+    .post(authUtils.isLoggedIn, controller.saveHike);  
 
 router.route('/uid=:id/reviews')
     .post(authUtils.isLoggedIn, controller.addReviewToHike);

@@ -8,4 +8,3 @@ let hikeSchema = new schema({
 
 
 module.exports = mongoose.model('Hike', hikeSchema);
-
