@@ -8,41 +8,47 @@ let controller = {};
 
 function filteredHikes(results) {
 
-    let filtered = results.body.places.filter(function (place) {
+    for(let place of results.body.places) {
         for (let prop in place) {
-
             if (place[prop] == null || prop === 'activities') {
                 delete place[prop];
             }
         }
         return place;
-    });
-
-    return filtered;
+  }
 }
 
 controller.me = (req, res, next) => {
 
     let me = req.user.id;
 
-
     Hike.find({
         _hiker: me
     }).then(function (response) {
 
-        let filteredHikes = response[0].hikes.map(function (id) {
+        var promises = [];
+
+        for (let i = 0; i < response[0].hikes.length; i++) {
+            promises.push(new Promise(function (resolve, reject) {
             
-            unirest.get(`${config.trailapi.baseUrl}/?q[unique_id_eq]=${id}`)
-                .header("X-Mashape-Key", config.trailapi.key)
-                .header("Accept", "text/plain")
-                .end(function (result) {
-                    return result;
+                unirest.get(`${config.trailapi.baseUrl}/?q[unique_id_eq]=${response[0].hikes[i]}`)
+                    .header("X-Mashape-Key", config.trailapi.key)
+                    .header("Accept", "text/plain")
+                    .end(function (result) {
+                        resolve(filteredHikes(result));
+                    });
+            }));
+        }
 
-                });
+        Promise.all(promises).then(function (results) {
+            res.status(200).json({
+                user: req.user,
+                hikes: results
+            });
+
+        }, function (error) {
+            next(error);
         });
-
-
-// TODO TODO TODO
 
     }).catch(function (error) {
         next(error);
