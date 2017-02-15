@@ -1,11 +1,16 @@
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const express = require('express');
+const path = require('path');
 const passport = require('passport');
 const strategy = require('../auth/auth.local_strategy');
 const User = require('../api/user/user.model');
 
 
 module.exports = function (app) {
+
+    app.use(express.static(path.resolve(__dirname, '../public')));
+    app.use('/libs', express.static(path.resolve(__dirname, '../node_modules')));
 
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({
